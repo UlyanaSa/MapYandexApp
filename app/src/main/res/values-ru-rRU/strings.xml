@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Map App</string>
+    <string name="go_to_map">Показать на карте</string>
+    <string name="current_location">Точка не задана</string>
+    <string name="confirm_selected_point">Подтвердить выбранную точку</string>
+</resources>
