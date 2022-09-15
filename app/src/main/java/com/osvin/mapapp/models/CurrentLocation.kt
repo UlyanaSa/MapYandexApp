@@ -6,8 +6,8 @@ import com.yandex.mapkit.location.Location
 data class CurrentLocation(
 //    val city: String,
 //    val street: String,
-    val latitude: Geocoder,
-    val longitude: Double
+    var latitude: Double,
+    var longitude: Double
 ) {
     override fun toString(): String {
         return "Address (${latitude}, $longitude)"
