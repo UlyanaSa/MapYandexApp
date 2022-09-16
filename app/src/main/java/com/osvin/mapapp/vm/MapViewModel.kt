@@ -3,28 +3,21 @@ package com.osvin.mapapp.vm
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.osvin.mapapp.AppRepository
+import com.osvin.mapapp.models.CurrentLocation
 import com.yandex.mapkit.geometry.Point
 import com.yandex.mapkit.map.MapObject
+import kotlinx.coroutines.launch
 
-class MapViewModel: ViewModel() {
+class MapViewModel(private val appRepository: AppRepository): ViewModel() {
 
-    private var _currentPoint = MutableLiveData<Point>()
-    var currentPoint: LiveData<Point> = _currentPoint
+    private var _currentLocation = MutableLiveData<CurrentLocation>()
+    var currentLocation: LiveData<CurrentLocation> = _currentLocation
 
-    private var _currentMapObject = MutableLiveData<MapObject>()
-    var currentObject: LiveData<MapObject> = _currentMapObject
-
-    private var _saveNew = MutableLiveData<Boolean>()
-    var saveNew: LiveData<Boolean> = _saveNew
-
-    fun saveMapObject(mapObject: MapObject){
-        _currentMapObject.value = mapObject
-        _saveNew.value = true
+    fun getLocation(){
+        viewModelScope.launch {
+            _currentLocation.value = appRepository.getLocation()
+        }
     }
-
-
-
-
-
-
 }

@@ -5,7 +5,9 @@ import android.app.Activity
 import android.app.Application
 import android.content.Context
 import android.content.Intent
+import android.location.Location
 import android.location.LocationManager
+import android.os.Looper
 import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
@@ -13,42 +15,66 @@ import androidx.core.content.ContextCompat.getSystemService
 import com.google.android.gms.location.*
 
 import com.osvin.mapapp.models.CurrentLocation
+import com.osvin.mapapp.utils.GpsLocationUtil
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
-class MyLocationService(private val context: Context) {
+
+class MyLocationService(context: Context) {
 
 
-    private val locationRequest: LocationRequest = LocationRequest.create()
-    private val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
+//    companion object {
+//        private val locationRequest: LocationRequest = LocationRequest.create().apply {
+//            interval = 60000
+//            fastestInterval = 10000
+//            priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+//        }
+//    }
+    private var fusedLocationProvider = LocationServices.getFusedLocationProviderClient(context)
+
+//    private var locationCallback: LocationCallback = object : LocationCallback() {
+//        override fun onLocationResult(locationResult: LocationResult) {
+//            val locationList = locationResult.locations
+//            if (locationList.isNotEmpty()) {
+//
+//                val location = locationList.last()
+//
+//            }
+//        }
+//    }
+//
+//    fun start(){
+//
+//    }
+//
+//    fun stop(){
+//        fusedLocationProvider.removeLocationUpdates(locationCallback)
+//    }
+
+//    @SuppressLint("MissingPermission")
+//    private fun startLocationUpdates() {
+//        fusedLocationProvider.requestLocationUpdates(locationRequest, locationCallback, null)
+//    }
 
 
-    private fun isLocationEnabled(): Boolean {
-        val locationService = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        return locationService.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationService.isProviderEnabled(
-            LocationManager.NETWORK_PROVIDER
-        )
-    }
     @SuppressLint("MissingPermission")
-    fun getLocation(): CurrentLocation{
-        val currentLocation = CurrentLocation(0.0, 0.0)
-        if(isLocationEnabled()){
-            fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-                currentLocation.latitude = location.latitude
-                currentLocation.longitude = location.longitude
-
+    suspend fun awaitLastLocation(): CurrentLocation {
+        return suspendCoroutine<CurrentLocation> { cont ->
+            fusedLocationProvider.lastLocation.addOnSuccessListener { location ->
+                // Resume coroutine and return location
+                cont.resume(CurrentLocation(location.latitude, location.longitude))
+            }.addOnFailureListener { e ->
+                // Resume the coroutine by throwing an exception
+                cont.resumeWithException(e)
             }
-        }else{
-            Toast.makeText(context, "Пожалуйста, включите определение местоположения", Toast.LENGTH_LONG).show()
-            val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
-            context.startActivity(intent)
         }
-        return currentLocation
     }
 
-
-
-    suspend fun getlocation(): CurrentLocation = suspendCoroutine { continuation ->
-
-
-    }
 }
+
+
