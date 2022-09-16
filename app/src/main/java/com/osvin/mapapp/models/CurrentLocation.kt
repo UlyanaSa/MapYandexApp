@@ -1,5 +1,6 @@
 package com.osvin.mapapp.models
 
+
 data class CurrentLocation(
     var latitude: Double,
     var longitude: Double

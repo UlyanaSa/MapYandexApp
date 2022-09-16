@@ -2,10 +2,12 @@ package com.osvin.mapapp.ui
 
 import android.R
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -30,8 +32,7 @@ class MapActivity : AppCompatActivity(), InputListener{
     @SuppressLint("MissingPermission")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        MapKitFactory.setApiKey(Constants.MY_API_KEY)
-        MapKitFactory.initialize(this)
+   //     MapKitFactory.getInstance()
         binding = ActivityMapBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -44,12 +45,27 @@ class MapActivity : AppCompatActivity(), InputListener{
         mapViewModel.getLocation()
 
         mapViewModel.currentLocation.observe(this, Observer {
-            moveMap(Point(it.latitude, it.longitude))
+            if(it != null){
+                moveMap(Point(it.latitude, it.longitude))
+            }
         })
 
+        val intent = Intent(this, MainActivity::class.java)
+        binding.bBack.setOnClickListener {
+            startActivity(intent)
+            finish()
+        }
 
+        mapViewModel.saveCurrentLocation.observe(this, Observer {
 
-
+            if(it == null){
+                Toast.makeText(this, "Выберите точку", Toast.LENGTH_SHORT).show()
+            }
+            else{
+                intent.putExtra(Constants.LAN, it.latitude.toString())
+                intent.putExtra(Constants.LON, it.longitude.toString())
+            }
+        })
 
    }
 
@@ -81,7 +97,9 @@ class MapActivity : AppCompatActivity(), InputListener{
         icon.setColorFilter(Color.RED)
         val viewProvider = ViewProvider(icon)
         binding.mapview.map.mapObjects.addPlacemark(point, viewProvider)
+        mapViewModel.savePoint(point)
         Log.d("TAG", "onMapTap: ${point.latitude}, ${point.longitude}")
+
     }
 
     override fun onMapLongTap(p0: Map, p1: Point) {}
