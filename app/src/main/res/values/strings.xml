@@ -6,4 +6,5 @@
     <string name="enable_now">Enable now</string>
     <string name="please_enable_location">Please enable location detection</string>
     <string name="success">All permissions received!</string>
+    <string name="permission_denied">"Permission denied"</string>
 </resources>

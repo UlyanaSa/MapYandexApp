@@ -5,6 +5,7 @@
     <string name="current_location">Точка не задана</string>
     <string name="confirm_selected_point">Подтвердить выбранную точку</string>
     <string name="enable_now">Включить сейчас</string>
-    <string name="please_enable_location">Включите, пожалуйста, определение местоположения</string>
+    <string name="please_enable_location">Включите, пожалуйста, GPS</string>
     <string name="success">Все разрешение получены!</string>
+    <string name="permission_denied">"Включите, пожалуста, разрешения для определения местополодения "</string>
 </resources>
