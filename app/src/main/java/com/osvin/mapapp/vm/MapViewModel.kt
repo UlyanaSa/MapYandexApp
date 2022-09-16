@@ -1,5 +1,4 @@
 package com.osvin.mapapp.vm
-
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel

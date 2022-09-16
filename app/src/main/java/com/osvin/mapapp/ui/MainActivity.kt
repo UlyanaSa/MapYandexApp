@@ -10,9 +10,6 @@ import com.osvin.mapapp.utils.Constants
 import com.osvin.mapapp.utils.GpsLocationUtil
 import com.osvin.mapapp.utils.LocationPermissionUtil
 
-import com.yandex.mapkit.MapKitFactory
-
-
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
