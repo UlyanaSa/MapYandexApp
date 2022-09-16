@@ -14,6 +14,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.osvin.mapapp.AppRepository
 import com.osvin.mapapp.databinding.ActivityMapBinding
 import com.osvin.mapapp.utils.Constants
+import com.osvin.mapapp.utils.GpsLocationUtil
 import com.osvin.mapapp.vm.MapVMFactory
 import com.osvin.mapapp.vm.MapViewModel
 import com.yandex.mapkit.Animation
@@ -32,7 +33,6 @@ class MapActivity : AppCompatActivity(), InputListener{
     @SuppressLint("MissingPermission")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-   //     MapKitFactory.getInstance()
         binding = ActivityMapBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -41,33 +41,23 @@ class MapActivity : AppCompatActivity(), InputListener{
 
         binding.mapview.map.isRotateGesturesEnabled = false
         moveMap(Constants.CAMERA_TARGET)
-        binding.mapview.map.addInputListener(this)
-        mapViewModel.getLocation()
 
-        mapViewModel.currentLocation.observe(this, Observer {
-            if(it != null){
-                moveMap(Point(it.latitude, it.longitude))
-            }
-        })
+        binding.mapview.map.addInputListener(this)
+
+        enabledLocation()
+        observeCurrentLocation()
 
         val intent = Intent(this, MainActivity::class.java)
+
+        observeSavePoint(intent)
         binding.bBack.setOnClickListener {
             startActivity(intent)
             finish()
         }
 
-        mapViewModel.saveCurrentLocation.observe(this, Observer {
-
-            if(it == null){
-                Toast.makeText(this, "Выберите точку", Toast.LENGTH_SHORT).show()
-            }
-            else{
-                intent.putExtra(Constants.LAN, it.latitude.toString())
-                intent.putExtra(Constants.LON, it.longitude.toString())
-            }
-        })
-
    }
+
+
 
     override fun onStart() {
         super.onStart()
@@ -81,6 +71,33 @@ class MapActivity : AppCompatActivity(), InputListener{
         MapKitFactory.getInstance().onStop()
     }
 
+    private fun enabledLocation(){
+        if(GpsLocationUtil.isLocationEnabled(this)){
+            mapViewModel.getLocation()
+        }else
+            GpsLocationUtil.showAlertDialog(this)
+    }
+
+    private fun observeCurrentLocation(){
+        mapViewModel.currentLocation.observe(this, Observer {
+            if(it != null){
+                moveMap(Point(it.latitude, it.longitude))
+            }
+        })
+    }
+
+    private fun observeSavePoint(intent: Intent){
+        mapViewModel.savePoint.observe(this, Observer {
+
+            if(it == null){
+                Toast.makeText(this, "Выберите точку", Toast.LENGTH_SHORT).show()
+            }
+            else{
+                intent.putExtra(Constants.LAN, it.latitude.toString())
+                intent.putExtra(Constants.LON, it.longitude.toString())
+            }
+        })
+    }
     private fun moveMap(point:Point){
         binding.mapview.map.move(
             CameraPosition(point, 14.0f, 0F, 0F),
@@ -97,7 +114,7 @@ class MapActivity : AppCompatActivity(), InputListener{
         icon.setColorFilter(Color.RED)
         val viewProvider = ViewProvider(icon)
         binding.mapview.map.mapObjects.addPlacemark(point, viewProvider)
-        mapViewModel.savePoint(point)
+        mapViewModel.savePointfunc(point)
         Log.d("TAG", "onMapTap: ${point.latitude}, ${point.longitude}")
 
     }

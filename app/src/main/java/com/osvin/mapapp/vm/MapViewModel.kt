@@ -15,11 +15,11 @@ class MapViewModel (private val appRepository: AppRepository): ViewModel() {
     private var _currentLocation = MutableLiveData<CurrentLocation>()
     var currentLocation: LiveData<CurrentLocation> = _currentLocation
 
-    private var _saveCurrentLocation = MutableLiveData<CurrentLocation>()
-    var saveCurrentLocation: LiveData<CurrentLocation> = _saveCurrentLocation
+    private var _savePoint = MutableLiveData<CurrentLocation>()
+    var savePoint: LiveData<CurrentLocation> = _savePoint
 
-    fun savePoint(point: Point){
-        _saveCurrentLocation.value = CurrentLocation(point.latitude, point.longitude)
+    fun savePointfunc(point: Point){
+        _savePoint.value = CurrentLocation(point.latitude, point.longitude)
     }
 
 

@@ -11,16 +11,14 @@ import kotlin.coroutines.suspendCoroutine
 
 class MyLocationService(private val context: Context){
 
-    private val fusedLocationProvider = FusedLocationProviderClient(context)
+    private val fusedLocationProvider = LocationServices.getFusedLocationProviderClient(context)
 
     @SuppressLint("MissingPermission")
     suspend fun awaitLastLocation(): CurrentLocation {
         return suspendCoroutine<CurrentLocation> { cont ->
             fusedLocationProvider.lastLocation.addOnSuccessListener { location ->
-                // Resume coroutine and return location
                 cont.resume(CurrentLocation(location.latitude, location.longitude))
             }.addOnFailureListener { e ->
-                // Resume the coroutine by throwing an exception
                 cont.resumeWithException(e)
             }
         }
