@@ -8,7 +8,7 @@ object Constants {
     const val REQUEST_CODE_FOREGROUND = 1
     const val REQUEST_CODE_FOREGROUND_AND_BACKGROUND = 2
     val CAMERA_TARGET = Point(55.751574, 37.573856)
-    const val SHARED_PREF_NAME = "SHARED_PREF"
+    const val ADDRESS = "ADDRESS"
     const val LAN = "LAN"
     const val LON = "LON"
 

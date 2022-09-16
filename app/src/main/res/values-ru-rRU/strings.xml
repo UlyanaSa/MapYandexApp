@@ -7,5 +7,6 @@
     <string name="enable_now">Включить сейчас</string>
     <string name="please_enable_location">Включите, пожалуйста, GPS</string>
     <string name="success">Все разрешение получены!</string>
-    <string name="permission_denied">"Включите, пожалуста, разрешения для определения местополодения "</string>
+    <string name="permission_denied">"Включите, пожалуста, разрешения для определения местополодения"</string>
+    <string name="no_address">"Невозможно определить адрес"</string>
 </resources>

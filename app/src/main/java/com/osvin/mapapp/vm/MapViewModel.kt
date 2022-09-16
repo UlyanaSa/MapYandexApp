@@ -5,27 +5,38 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.osvin.mapapp.AppRepository
 import com.osvin.mapapp.models.CurrentLocation
+import com.osvin.mapapp.utils.CameraPositionState
 import com.yandex.mapkit.geometry.Point
+import com.yandex.mapkit.map.CameraPosition
 import kotlinx.coroutines.launch
 
 
 
 class MapViewModel (private val appRepository: AppRepository): ViewModel() {
 
-    private var _currentLocation = MutableLiveData<CurrentLocation>()
-    var currentLocation: LiveData<CurrentLocation> = _currentLocation
+    private var _currentLocationLiveData = MutableLiveData<CurrentLocation>()
+    var currentLocationLiveData: LiveData<CurrentLocation> = _currentLocationLiveData
 
-    private var _savePoint = MutableLiveData<CurrentLocation>()
-    var savePoint: LiveData<CurrentLocation> = _savePoint
+    private var _saveAddressLiveData = MutableLiveData<String>()
+    var saveAddressLiveData: LiveData<String> = _saveAddressLiveData
 
-    fun savePointfunc(point: Point){
-        _savePoint.value = CurrentLocation(point.latitude, point.longitude)
+    private var _cameraPositionLiveData = MutableLiveData<CameraPositionState>()
+    var cameraPositionLiveData: LiveData<CameraPositionState> = _cameraPositionLiveData
+
+    fun getPointAddress(lan: Double, lon: Double){
+        _saveAddressLiveData.value = appRepository.getPointAddress(lan, lon)
     }
-
 
     fun getLocation(){
         viewModelScope.launch {
-            _currentLocation.value = appRepository.getLocation()
+            _currentLocationLiveData.value = appRepository.getLocation()
         }
+    }
+
+    fun cameraPositionState(cameraPosition: Float){
+        if(cameraPosition>=15)
+            _cameraPositionLiveData.value = CameraPositionState.OVER15
+        else
+            _cameraPositionLiveData.value = CameraPositionState.UNDER15
     }
 }

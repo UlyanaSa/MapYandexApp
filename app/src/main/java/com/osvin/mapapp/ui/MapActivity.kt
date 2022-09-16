@@ -13,6 +13,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.osvin.mapapp.AppRepository
 import com.osvin.mapapp.databinding.ActivityMapBinding
+import com.osvin.mapapp.utils.CameraPositionState
 import com.osvin.mapapp.utils.Constants
 import com.osvin.mapapp.utils.GpsLocationUtil
 import com.osvin.mapapp.vm.MapVMFactory
@@ -23,7 +24,6 @@ import com.yandex.mapkit.geometry.*
 import com.yandex.mapkit.map.*
 import com.yandex.mapkit.map.Map
 import com.yandex.runtime.ui_view.ViewProvider
-
 
 
 class MapActivity : AppCompatActivity(), InputListener{
@@ -49,12 +49,13 @@ class MapActivity : AppCompatActivity(), InputListener{
 
         val intent = Intent(this, MainActivity::class.java)
 
-        observeSavePoint(intent)
+        observeSaveAddressPoint(intent)
         binding.bBack.setOnClickListener {
             startActivity(intent)
             finish()
         }
 
+        observeCameraPosition()
    }
 
 
@@ -78,23 +79,29 @@ class MapActivity : AppCompatActivity(), InputListener{
             GpsLocationUtil.showAlertDialog(this)
     }
 
+    private fun observeCameraPosition(){
+        mapViewModel.cameraPositionLiveData.observe(this, Observer {
+            if(it == CameraPositionState.UNDER15){
+                Toast.makeText(this, "При таком зуме сложно определить адрес", Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+
     private fun observeCurrentLocation(){
-        mapViewModel.currentLocation.observe(this, Observer {
+        mapViewModel.currentLocationLiveData.observe(this, Observer {
             if(it != null){
                 moveMap(Point(it.latitude, it.longitude))
             }
         })
     }
 
-    private fun observeSavePoint(intent: Intent){
-        mapViewModel.savePoint.observe(this, Observer {
-
+    private fun observeSaveAddressPoint(intent: Intent){
+        mapViewModel.saveAddressLiveData.observe(this, Observer {
             if(it == null){
                 Toast.makeText(this, "Выберите точку", Toast.LENGTH_SHORT).show()
             }
             else{
-                intent.putExtra(Constants.LAN, it.latitude.toString())
-                intent.putExtra(Constants.LON, it.longitude.toString())
+                intent.putExtra(Constants.ADDRESS, it)
             }
         })
     }
@@ -107,6 +114,7 @@ class MapActivity : AppCompatActivity(), InputListener{
     }
 
     override fun onMapTap(map: Map, point: Point) {
+
         binding.mapview.map.deselectGeoObject()
         map.mapObjects.clear()
         val icon = ImageView(this)
@@ -114,11 +122,11 @@ class MapActivity : AppCompatActivity(), InputListener{
         icon.setColorFilter(Color.RED)
         val viewProvider = ViewProvider(icon)
         binding.mapview.map.mapObjects.addPlacemark(point, viewProvider)
-        mapViewModel.savePointfunc(point)
-        Log.d("TAG", "onMapTap: ${point.latitude}, ${point.longitude}")
+        mapViewModel.getPointAddress(point.latitude, point.longitude)
+        val cameraPosition = binding.mapview.map.cameraPosition.zoom
+        mapViewModel.cameraPositionState(cameraPosition)
 
     }
 
     override fun onMapLongTap(p0: Map, p1: Point) {}
-
 }

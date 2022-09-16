@@ -55,10 +55,8 @@ class MainActivity : AppCompatActivity() {
     private fun getSaveLocation() {
         if (intent.extras != null) {
             val bundle = intent.extras
-            val lan = bundle!!.getString(Constants.LAN, "LAN")
-            val lon = bundle!!.getString(Constants.LON, "LON")
-            val currentLocation = CurrentLocation(lan.toDouble(), lon.toDouble())
-            binding.tLocation.text = currentLocation.toString()
+            val addressPoint = bundle!!.getString(Constants.ADDRESS, getString(R.string.current_location))
+            binding.tLocation.text = addressPoint
         } else
             binding.tLocation.text = getString(R.string.current_location)
     }
